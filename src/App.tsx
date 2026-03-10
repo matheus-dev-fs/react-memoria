@@ -4,15 +4,16 @@ import logoImage from "./assets/devmemory_logo.png";
 import RestartIcon from "./svgs/restart.svg";
 import { InfoItem } from "./components/info-item/info-item.component";
 import { Button } from "./components/button/button.component";
-import { GridItem } from "./types/grid-item.type";
+import { GridItemType } from "./types/grid-item.type";
 import { items } from "./data/items.data";
+import { GridItem } from "./components/grid-item/grid-item.component";
 
 const App = (): JSX.Element => {
     const [playing, setPlaying]: [boolean, Dispatch<SetStateAction<boolean>>] = useState<boolean>(false);
     const [timeElapsed, setTimeElapsed]: [number, Dispatch<SetStateAction<number>>] = useState<number>(0);
     const [moveCount, setMoveCount]: [number, Dispatch<SetStateAction<number>>] = useState<number>(0);
     const [shownCount, setShownCount]: [number, Dispatch<SetStateAction<number>>] = useState<number>(0);
-    const [gridItems, setGridItems]: [GridItem[], Dispatch<SetStateAction<GridItem[]>>] = useState<GridItem[]>([]);
+    const [gridItems, setGridItems]: [GridItemType[], Dispatch<SetStateAction<GridItemType[]>>] = useState<GridItemType[]>([]);
 
     useEffect((): void => {
         resetAndCreateGrid();
@@ -24,16 +25,16 @@ const App = (): JSX.Element => {
         setShownCount(0);
 
         const tmpGridLength: number = items.length * 2;
-        const tmpGrid: GridItem[] = new Array(tmpGridLength).fill({  
-            item: null, 
-            isShown: false, 
-            permanentlyShown: false 
-        });
+        const tmpGrid: GridItemType[] = Array.from({ length: tmpGridLength }, (): GridItemType => ({
+            item: null,
+            isShown: false,
+            permanentlyShown: false
+        }));
 
         for (let i = 0; i < 2; i++) {
             for (let j = 0; j < items.length; j++) {
                 const pos: number = Math.floor(Math.random() * tmpGridLength);
-                
+
                 if (tmpGrid[pos].item === null) {
                     tmpGrid[pos].item = j;
                 } else {
@@ -43,8 +44,12 @@ const App = (): JSX.Element => {
         }
 
         setGridItems(tmpGrid);
-        
+
         setPlaying(true);
+    };
+
+    const handleItemClick = (index: number): void => {
+
     };
 
     return (
@@ -63,7 +68,13 @@ const App = (): JSX.Element => {
             </C.Info>
             <C.GridArea>
                 <C.Grid>
-
+                    {gridItems.map((item: GridItemType, index: number): JSX.Element => (
+                        <GridItem
+                            key={index}
+                            item={item}
+                            onClick={() => handleItemClick(index)}
+                        />
+                    ))}
                 </C.Grid>
             </C.GridArea>
         </C.Container>
