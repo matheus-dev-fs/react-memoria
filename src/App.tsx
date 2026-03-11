@@ -7,6 +7,7 @@ import { Button } from "./components/button/button.component";
 import { GridItemType } from "./types/grid-item.type";
 import { items } from "./data/items.data";
 import { GridItem } from "./components/grid-item/grid-item.component";
+import { formatTimeElapsed } from "./utils/format-time-elapsed.util";
 
 const App = (): JSX.Element => {
     const [playing, setPlaying]: [boolean, Dispatch<SetStateAction<boolean>>] = useState<boolean>(false);
@@ -18,6 +19,18 @@ const App = (): JSX.Element => {
     useEffect((): void => {
         resetAndCreateGrid();
     }, []);
+
+    useEffect((): () => void => {
+        const timer: NodeJS.Timeout = setInterval((): void => {
+            if (!playing) {
+                return;
+            }
+
+            setTimeElapsed((time: number): number => time + 1);
+        }, 1000);
+
+        return (): void => clearInterval(timer);
+    }, [playing, timeElapsed]);
 
     const resetAndCreateGrid = (): void => {
         setTimeElapsed(0);
@@ -60,7 +73,7 @@ const App = (): JSX.Element => {
                 </C.LogoLink>
 
                 <C.InfoArea>
-                    <InfoItem label="Tempo" value={timeElapsed.toString()} />
+                    <InfoItem label="Tempo" value={formatTimeElapsed(timeElapsed)} />
                     <InfoItem label="Movimentos" value={moveCount.toString()} />
                 </C.InfoArea>
 
