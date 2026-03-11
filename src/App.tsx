@@ -32,6 +32,51 @@ const App = (): JSX.Element => {
         return (): void => clearInterval(timer);
     }, [playing, timeElapsed]);
 
+    useEffect((): void => {
+        if (shownCount < 2) {
+            return;
+        }
+
+        const openedItems: GridItemType[] = gridItems.filter((item: GridItemType): boolean => item.isShown);
+
+        if (openedItems.length !== 2) {
+            return;
+        }
+
+        const [first, second]: GridItemType[] = openedItems;
+        const tmpGrid: GridItemType[] = [...gridItems];
+
+        setTimeout((): void => {
+            tmpGrid.forEach((item: GridItemType): void => {
+                if (!item.isShown) {
+                    return;
+                }
+
+                if (item.item === first.item && item.item === second.item) {
+                    item.permanentlyShown = true;
+                }  
+                       
+                item.isShown = false;
+            });
+
+            setGridItems(tmpGrid);
+            setShownCount(0);
+            setMoveCount((moveCount: number): number => moveCount + 1);
+        }, 1000);
+    }, [shownCount, gridItems]);
+
+    useEffect((): void => {
+        if (moveCount === 0) {
+            return;
+        }
+
+        const allPermanentlyShown: boolean = gridItems.every((item: GridItemType): boolean => item.permanentlyShown);
+
+        if (allPermanentlyShown) {
+            setPlaying(false);
+        }
+    }, [moveCount, gridItems]);
+
     const resetAndCreateGrid = (): void => {
         setTimeElapsed(0);
         setMoveCount(0);
@@ -74,9 +119,7 @@ const App = (): JSX.Element => {
 
         tmpGrid[index].isShown = true;  
 
-        setMoveCount((moveCount: number): number => moveCount + 1);
         setShownCount((shownCount: number): number => shownCount + 1);
-        
         setGridItems(tmpGrid);
     };
 
