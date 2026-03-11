@@ -62,7 +62,22 @@ const App = (): JSX.Element => {
     };
 
     const handleItemClick = (index: number): void => {
+        if (index === undefined || !playing || shownCount === 2) {
+            return;
+        }
 
+        const tmpGrid: GridItemType[] = [...gridItems];
+
+        if (tmpGrid[index].isShown || tmpGrid[index].permanentlyShown) {
+            return;
+        }
+
+        tmpGrid[index].isShown = true;  
+
+        setMoveCount((moveCount: number): number => moveCount + 1);
+        setShownCount((shownCount: number): number => shownCount + 1);
+        
+        setGridItems(tmpGrid);
     };
 
     return (
